@@ -2,23 +2,36 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Statement;
 import java.util.*;
 
 public class NFA {
     private File nfaEncoding;
-    private Set<String> nfaStates = new HashSet<>();
-    private String startingState;
-    private Set<String> acceptingStates = new HashSet<>();;
-    private HashMap<String, HashMap<String, Set<String>>> transitionTable = new HashMap<>();
-    private HashMap<String, Set<String>> epsilonMoveStates = new HashMap<>();
 
+    private Set<String> nfaStates = new HashSet<>();
     public Set<String> getNfaStates() {
         return this.nfaStates;
     }
 
+    private String startingState;
     public String getStartingState() {
         return this.startingState;
+    }
+
+    private Set<String> acceptingStates = new HashSet<>();;
+
+    private HashMap<String, HashMap<String, Set<String>>> transitionTable = new HashMap<>();
+    public HashMap<String, HashMap<String, Set<String>>> getTransitionTable() {
+        return transitionTable;
+    }
+
+    private HashMap<String, Set<String>> epsilonMoveStates = new HashMap<>();
+    public HashMap<String, Set<String>> getEpsilonMoveStates() {
+        return epsilonMoveStates;
+    }
+
+    private HashSet<String> inputSymbols = new HashSet<>();
+    public HashSet<String> getInputSymbols() {
+        return inputSymbols;
     }
 
     public NFA(File nfaEncoding) throws IOException{
@@ -46,7 +59,6 @@ public class NFA {
         reader.close();
 
         parseEpsilonTransitionStates();
-        System.out.println(this.nfaStates);
     }
 
     private void parseAcceptingStates(String[] acceptingStates){
@@ -82,8 +94,13 @@ public class NFA {
             return;
 
         String transitionFunction = transitionFunctions[0];
+        // In 'fromStateStringToState` 0th position will have from state,
+        // 1st position will have input symbol,
+        // 2nd position will have to state
         String[] fromStateStringToState = transitionFunction.split("");
 
+        // Identify and store the input symbols for the language
+        this.inputSymbols.add(fromStateStringToState[1]);
 
         if(this.transitionTable.containsKey(fromStateStringToState[0])){
             if(this.transitionTable.get(fromStateStringToState[0]).containsKey(fromStateStringToState[1])){
@@ -127,24 +144,48 @@ public class NFA {
 
     }
 
-    //TODO: Yet to implement
+
     public boolean trace(String inputString){
         // CurrentStates the given character is in
         Set<String> currentStates = new HashSet<>();
         currentStates.add(this.startingState);
 
         for(char inputChar : inputString.toCharArray()){
+            // If the input symbol is not in the defined symbols, language is not accepted.
+            if(! this.inputSymbols.contains(String.valueOf(inputChar)))
+                return false;
             //The next states the character can travel to
             Set<String> nextStates = new HashSet<>();
 
             for(String state : currentStates){
                 // check if the given current state exists in the transition table & find next state
-                if(
-                        this.transitionTable.containsKey(state) &&
-                                this.transitionTable.get(state).containsKey(String.valueOf(inputChar))
+                if( this.transitionTable.containsKey(state) &&
+                        this.transitionTable.get(state).containsKey(String.valueOf(inputChar))
                 )
                     nextStates.addAll( this.transitionTable.get(state).get(String.valueOf(inputChar)) );
+
+                // Now we need to check if among these transitions, is there epsilon transition
+                if(this.epsilonMoveStates.containsKey(state)){
+                    for(String epsilonMove : this.epsilonMoveStates.get(state)){
+                        if(this.transitionTable.containsKey(epsilonMove) &&
+                                this.transitionTable.get(epsilonMove).containsKey(String.valueOf(inputChar))
+                        )
+                            nextStates.addAll(this.transitionTable.get(epsilonMove).get(String.valueOf(inputChar)));
+                    }
+                }
             }
+
+            //Update the current states with the next states
+            currentStates = nextStates;
+
+            // if there is no current state, the input string is not accepted
+            if(currentStates.isEmpty())
+                return false;
+        }
+
+        for(String currentState : currentStates){
+            if(acceptingStates.contains(currentState))
+                return true;
         }
 
         return false;

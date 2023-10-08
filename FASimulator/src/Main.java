@@ -27,18 +27,19 @@ public class Main {
             }
         }
         else {
-            //File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/tc0.txt");
-            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/bm3.txt");
-//            BufferedReader nfaReader = new BufferedReader( new FileReader(nfaEncodingFile));
-//            String finalStates = nfaReader.readLine();
-//            String startState = nfaReader.readLine();
-//            String remainingStates = nfaReader.readLine();
-//            String stateTransitions = nfaReader.readLine();
-//            nfaReader.close();
+            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/tc0.txt");
+//            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/bm3.txt");
+//            File inputStringFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/in3_5.txt");
+            File inputStringFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/eval1_3.txt");
+            BufferedReader inputStringReader = new BufferedReader( new FileReader(inputStringFile));
+            inputString = inputStringReader.readLine();
+
             NFA nfa = new NFA(nfaEncodingFile);
+//            if(nfa.trace(inputString))
+//                System.out.println("yes");
+//            else
+//                System.out.println("no");
+            DFA dfa = new DFA(nfa, true);
         }
-
-
-        System.out.println("Hello world!");
     }
 }
