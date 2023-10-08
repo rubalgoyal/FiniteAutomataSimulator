@@ -25,6 +25,35 @@ public class DFA {
         convertToDfa(printConversion);
     }
 
+    public boolean trace(String inputString){
+        // CurrentStates the given character is in
+        Set<String> currentStates = this.startingState;
+
+        // Trace to store the path
+        List<String> tracePath = new ArrayList<>();
+        currentStates.add(String.join(",", currentStates));
+
+        for(char inputChar : inputString.toCharArray()){
+            if(!this.nfa.getInputSymbols().contains(String.valueOf(inputChar)))
+                return  false;
+            Map<String, Set<String>> transitions = this.dfaTransitionTable.get(currentStates);
+
+            if(transitions != null && transitions.containsKey(String.valueOf(inputChar))){
+                Set<String> nextState = transitions.get(String.valueOf(inputChar));
+                currentStates = nextState;
+            }
+            else
+                return false;
+            tracePath.add(String.join(",", currentStates));
+        }
+
+        for(String state: currentStates){
+            if(this.nfa.getAcceptingStates().contains(state))
+                return true;
+        }
+        return false;
+    }
+
     private void convertToDfa(boolean printStates){
         // Initialize an empty queue to get Epsilon move states of NFA
         Queue<Set<String>> stateQueue = new LinkedList<>();

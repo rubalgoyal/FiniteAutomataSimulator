@@ -17,7 +17,10 @@ public class NFA {
         return this.startingState;
     }
 
-    private Set<String> acceptingStates = new HashSet<>();;
+    private Set<String> acceptingStates = new HashSet<>();
+    public Set<String> getAcceptingStates() {
+        return acceptingStates;
+    }
 
     private HashMap<String, HashMap<String, Set<String>>> transitionTable = new HashMap<>();
     public HashMap<String, HashMap<String, Set<String>>> getTransitionTable() {
@@ -141,7 +144,6 @@ public class NFA {
                 this.epsilonMoveStates.get(currentState).addAll(this.transitionTable.get(currentState).get("e"));
             }
         }
-
     }
 
 
@@ -186,6 +188,13 @@ public class NFA {
         for(String currentState : currentStates){
             if(acceptingStates.contains(currentState))
                 return true;
+            else if (this.epsilonMoveStates.containsKey(currentState)) {
+                for(String epsilonState: this.epsilonMoveStates.get(currentState)){
+                    if(this.acceptingStates.contains(epsilonState))
+                        return true;
+                }
+
+            }
         }
 
         return false;
