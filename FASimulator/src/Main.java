@@ -28,25 +28,31 @@ public class Main {
             }
         }
         else {
-            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/tc3.txt");
-//            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/bm3.txt");
-            File inputStringFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/in3_1.txt");
-//            File inputStringFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/eval1_3.txt");
+//            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/tc3.txt");
+            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/bm3.txt");
+//            File inputStringFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/in3_1.txt");
+            File inputStringFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/eval3_4.txt");
             BufferedReader inputStringReader = new BufferedReader( new FileReader(inputStringFile));
             inputString = inputStringReader.readLine();
 
             NFA nfa = new NFA(nfaEncodingFile);
-            System.out.println(nfa.trace(inputString));
-            System.out.println(nfa.getAcceptingStates());
+//            System.out.println(nfa.trace(inputString));
+//            System.out.println(nfa.getAcceptingStates());
 //            if(nfa.trace(inputString))
 //                System.out.println("yes");
 //            else
 //                System.out.println("no");
-//            DFA dfa = new DFA(nfa, true);
-//            if(dfa.trace(inputString))
-//                System.out.println("yes");
-//            else
-//                System.out.println("no");
+            DFA dfa = new DFA(nfa, false);
+            DFAMinimized dfaMinimized = new DFAMinimized(dfa);
+            if(dfa.trace(inputString))
+                System.out.println("yes");
+            else
+                System.out.println("no");
+
+            if(dfaMinimized.trace(inputString))
+                System.out.println("yes");
+            else
+                System.out.println("no");
         }
     }
 }

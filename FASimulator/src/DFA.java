@@ -2,14 +2,33 @@ import java.util.*;
 
 public class DFA {
     private NFA nfa;
+    public NFA getNfa() {
+        return nfa;
+    }
+
     private Set<Set<String>> dfaStates = new HashSet<>();
+    public Set<Set<String>> getDfaStates() {
+        return dfaStates;
+    }
 
     private Set<String> startingState = new HashSet<>();
+    public Set<String> getStartingState() {
+        return startingState;
+    }
+
+    private Set<Set<String>> acceptingStates = new HashSet<>();
+    public Set<Set<String>> getAcceptingStates() {
+        return acceptingStates;
+    }
 
     private String nfaStartingState;
     private HashMap<String, Set<String>> nfaEpsilonMoveStates = new HashMap<>();
 
     private HashMap<Set<String>, Map<String, Set<String>>> dfaTransitionTable = new HashMap<>();
+    public HashMap<Set<String>, Map<String, Set<String>>> getDfaTransitionTable() {
+        return dfaTransitionTable;
+    }
+
 
     public DFA(NFA nfa){
         this.nfa = nfa;
@@ -95,9 +114,18 @@ public class DFA {
                         this.dfaStates.add(epsilonClosure);
                         stateQueue.offer(epsilonClosure);
                     }
+
                 }
 
                 this.dfaTransitionTable.put(currentState, transition);
+
+                for(String finalState: this.nfa.getAcceptingStates()){
+                    if(currentState.contains(finalState))
+                        this.acceptingStates.add(currentState);
+                    if(nextStates.contains(finalState))
+                        this.acceptingStates.add(nextStates);
+                }
+
             }
         }
 
