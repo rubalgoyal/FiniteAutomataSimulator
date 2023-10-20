@@ -12,7 +12,8 @@ In this porject, I have implemented a Finite Automata Simulator. For any given N
 
 ## Code Implementation:
 Along with implmenting the code, I have also tried to automate the **testing** by implementing unit testing for _tests/_ encoding and input strings.
-  - `Main.java` : This is the main class for executing the FA. It accepts the 3 inputs ```simulationType, pathToNfaEncodingFile, pathToInputStringFile```. 
-  - `NFA.java` :
-  - `DFA.java` :
+  - `Main.java` : This is the main class for executing the FA. It requires 3 inputs ```simulationType, pathToNfaEncodingFile, pathToInputStringFile```.<br/>
+     Depending on the simulation type (**simulationType = 1 $\rightarrow$ NFA, simulationType = 2 $\rightarrow$ DFA, simulationType = 3 $\rightarrow$ DFAMinimized**), main class creates the instances of NFA/DFA/DFAMinimized as necessary and then traces the string. The result is printed as "yes" or "no" as explained above.
+  - `NFA.java` : The class implements the methods to parse the encoding into nfaStates, startingState, acceptingStates, inputSymbols, transitionFunction. and epsilonMoveStates in the constructor `NFA(File nfaEncoding)`. The the method `trace(String inputString)` can be invoked on the instance of the class to trace the string.
+  - `DFA.java` : This class converts the `NFA nfa` instance into DFA parsing all the 5 tuples similar to `NFA.java`
   - `DFAMinimized.java` :
