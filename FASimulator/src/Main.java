@@ -12,47 +12,50 @@ public class Main {
         3 -> DFA_min
         4 -> DFA_dist
          */
-        int simulationType;
-        String nfaEncoding;
-        String inputString;
-        if (args.length != 0){
-            if (args.length == 3){
-                simulationType = Integer.parseInt(args[0]);
-                BufferedReader reader = new BufferedReader(new FileReader(args[1]));
-                inputString = reader.readLine();
-                reader.close();
-            }
-            else{
-                System.out.println("Please enter exactly 3 arguments (simulation type,NFA encoding file, input string file)");
+        NFA nfa;
+        if (args.length == 3){
+            int simulationType = Integer.parseInt(args[0]);
+            if(simulationType > 5){
+                System.out.println("Simulation type needs to be between 1-4");
                 System.exit(1);
             }
+            File nfaEncoder = new File(args[1]);
+            BufferedReader inputStringReader = new BufferedReader(new FileReader(args[2]));
+            String inputString = inputStringReader.readLine();
+            inputStringReader.close();
+
+            nfa = new NFA(nfaEncoder);
+
+            if(simulationType == 1){
+                if(nfa.trace(inputString))
+                    System.out.println("yes");
+                else
+                    System.out.println("no");
+            }
+            else {
+                DFA dfa = new DFA(nfa);
+                if(simulationType == 2){
+                    if(dfa.trace(inputString))
+                        System.out.println("yes");
+                    else
+                        System.out.println("no");
+                }
+                else {
+                    DFAMinimized dfaMinimized = new DFAMinimized(dfa);
+                    if(simulationType == 3){
+                        if(dfaMinimized.trace(inputString))
+                            System.out.println("yes");
+                        else
+                            System.out.println("no");
+                    } else if (simulationType == 4) {
+                        System.out.println("Not implemented");
+                    }
+                }
+            }
         }
-        else {
-//            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/tc3.txt");
-            File nfaEncodingFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/bm3.txt");
-//            File inputStringFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/tests/in3_1.txt");
-            File inputStringFile = new File("/Users/rubalgoyal/Desktop/561_TOC/FiniteAutomataSimulator/EncodingTestCase/evals/eval3_4.txt");
-            BufferedReader inputStringReader = new BufferedReader( new FileReader(inputStringFile));
-            inputString = inputStringReader.readLine();
-
-            NFA nfa = new NFA(nfaEncodingFile);
-//            System.out.println(nfa.trace(inputString));
-//            System.out.println(nfa.getAcceptingStates());
-//            if(nfa.trace(inputString))
-//                System.out.println("yes");
-//            else
-//                System.out.println("no");
-            DFA dfa = new DFA(nfa, false);
-            DFAMinimized dfaMinimized = new DFAMinimized(dfa);
-            if(dfa.trace(inputString))
-                System.out.println("yes");
-            else
-                System.out.println("no");
-
-            if(dfaMinimized.trace(inputString))
-                System.out.println("yes");
-            else
-                System.out.println("no");
+        else{
+            System.out.println("Please enter exactly 3 arguments (simulation type,NFA encoding file, input string file)");
+            System.exit(1);
         }
     }
 }
