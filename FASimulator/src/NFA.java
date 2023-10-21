@@ -200,4 +200,13 @@ public class NFA {
         return false;
     }
 
+    public int countNumTransitions(){
+        int count = 0;
+        for(String fromState: this.getTransitionTable().keySet()){
+            for(String character: this.getTransitionTable().get(fromState).keySet())
+                count = count + 1;
+        }
+        return count;
+    }
+
 }

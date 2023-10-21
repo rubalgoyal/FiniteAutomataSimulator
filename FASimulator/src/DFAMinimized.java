@@ -175,4 +175,27 @@ public class DFAMinimized {
         return currentGroup;
     }
 
+    public int countStates(){
+        int count = 0;
+        for(String group: this.nonFinalStates.keySet()){
+            count = count + 1;
+        }
+
+        for(String group: this.finalStates.keySet()){
+            count = count + 1;
+        }
+
+        return count;
+    }
+
+    public int countTransitions(){
+        int count = 0;
+        for(String fromState: this.transitionMatrix.keySet()){
+            for(String inp: this.transitionMatrix.get(fromState).keySet())
+                count = count + 1;
+        }
+
+        return count;
+    }
+
 }

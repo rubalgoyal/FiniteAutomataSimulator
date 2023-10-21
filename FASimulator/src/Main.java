@@ -12,6 +12,7 @@ public class Main {
         3 -> DFA_min
         4 -> DFA_dist
          */
+
         NFA nfa;
         if (args.length == 3){
             int simulationType = Integer.parseInt(args[0]);

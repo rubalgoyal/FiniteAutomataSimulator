@@ -43,6 +43,20 @@ public class Evaluation {
             DFA dfa = new DFA(nfa);
             DFAMinimized dfaMinimized = new DFAMinimized(dfa);
 
+            List<Integer> nfaStatesTransitions = new ArrayList<>();
+            nfaStatesTransitions.add(nfa.getNfaStates().size());
+            nfaStatesTransitions.add(nfa.countNumTransitions());
+
+            List<Integer> dfaStatesTransitions = new ArrayList<>();
+            dfaStatesTransitions.add(dfa.getDfaStates().size());
+            dfaStatesTransitions.add(dfa.countNumTransitions());
+
+            List<Integer> dfaMinStatesTransitions = new ArrayList<>();
+            dfaMinStatesTransitions.add(dfaMinimized.countStates());
+            dfaMinStatesTransitions.add(dfaMinimized.countTransitions());
+
+            System.out.printf("%-20s%-10s%-10s%-15s%n", "Size", nfaStatesTransitions, dfaStatesTransitions, dfaMinStatesTransitions);
+
 
             for (String inputFile: encodingInputFiles.get(fileName)){
                 BufferedReader reader = new BufferedReader(new FileReader(String.join("/",folderPath, inputFile)));

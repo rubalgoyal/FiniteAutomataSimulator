@@ -21,9 +21,6 @@ public class DFA {
         return acceptingStates;
     }
 
-    private String nfaStartingState;
-    private HashMap<String, Set<String>> nfaEpsilonMoveStates = new HashMap<>();
-
     private HashMap<Set<String>, Map<String, Set<String>>> dfaTransitionTable = new HashMap<>();
     public HashMap<Set<String>, Map<String, Set<String>>> getDfaTransitionTable() {
         return dfaTransitionTable;
@@ -32,16 +29,8 @@ public class DFA {
 
     public DFA(NFA nfa){
         this.nfa = nfa;
-        this.nfaStartingState = nfa.getStartingState();
-        this.nfaEpsilonMoveStates = nfa.getEpsilonMoveStates();
-        convertToDfa(false);
-    }
-
-    public DFA(NFA nfa, boolean printConversion){
-        this.nfa = nfa;
-        this.nfaStartingState = nfa.getStartingState();
-        this.nfaEpsilonMoveStates = nfa.getEpsilonMoveStates();
-        convertToDfa(printConversion);
+        getDfaStartState();
+        convertToDfa();
     }
 
     public boolean trace(String inputString){
@@ -73,16 +62,9 @@ public class DFA {
         return false;
     }
 
-    private void convertToDfa(boolean printStates){
+    private void convertToDfa(){
         // Initialize an empty queue to get Epsilon move states of NFA
         Queue<Set<String>> stateQueue = new LinkedList<>();
-
-        // First insert the NFA start state as the DFA start state
-        this.startingState.add( this.nfaStartingState );
-
-        // Then calculate the NFA starting state closure and add it as the DFA starting state
-        if( this.nfaEpsilonMoveStates.containsKey(this.nfaStartingState) )
-            this.startingState.addAll(this.nfaEpsilonMoveStates.get(this.nfaStartingState));
 
         stateQueue.offer(this.startingState);
 
@@ -91,6 +73,8 @@ public class DFA {
             Map<String, Set<String>> transition = new HashMap<>();
 
             for(String inputSymbol : this.nfa.getInputSymbols()){
+                if(inputSymbol.equals("e"))
+                    continue;
                 Set<String> nextStates = new HashSet<>();
 
                 // First find all the next move state for that symbol
@@ -105,47 +89,62 @@ public class DFA {
                 Set<String> epsilonClosure = new HashSet<>();
                 for(String nextState: nextStates){
                     epsilonClosure.add(nextState);
-                    epsilonClosure.addAll( this.nfaEpsilonMoveStates.getOrDefault(nextState, Collections.emptySet()) );
+                    epsilonClosure.addAll( this.nfa.getEpsilonMoveStates().getOrDefault(nextState, Collections.emptySet()) );
                 }
 
                 if(!epsilonClosure.isEmpty()){
                     transition.put(inputSymbol, epsilonClosure);
-                    if(!this.dfaStates.contains(epsilonClosure)){
+                    if(!this.dfaStates.contains(epsilonClosure) & transition.size() > 0){
                         this.dfaStates.add(epsilonClosure);
                         stateQueue.offer(epsilonClosure);
                     }
 
                 }
 
-                this.dfaTransitionTable.put(currentState, transition);
+                if(transition.size() > 0){
+                    this.dfaTransitionTable.put(currentState, transition);
 
-                for(String finalState: this.nfa.getAcceptingStates()){
-                    if(currentState.contains(finalState))
-                        this.acceptingStates.add(currentState);
-                    if(nextStates.contains(finalState))
-                        this.acceptingStates.add(nextStates);
-                }
-
-            }
-        }
-
-        if(printStates){
-            // For debugging purpose
-            System.out.println("DFA States:");
-            for(Set<String> state: this.dfaStates){
-                System.out.println(state);
-            }
-
-            System.out.println("DFA Transition");
-            for(Map.Entry<Set<String>, Map<String, Set<String>>> entry: this.dfaTransitionTable.entrySet() ){
-                Set<String> fromState = entry.getKey();
-                Map<String, Set<String>> transitions = entry.getValue();
-                for(Map.Entry<String, Set<String>> transEntry : transitions.entrySet()){
-                    String input = transEntry.getKey();
-                    Set<String> toState = transEntry.getValue();
-                    System.out.println(fromState + " -> " + input + " -> " + toState);
+                    for(String finalState: this.nfa.getAcceptingStates()){
+                        // If NFA's accepting state is contained in epsilon closure
+                        if(epsilonClosure.contains(finalState))
+                            this.acceptingStates.addAll(Collections.singleton(epsilonClosure));
+//                        if(currentState.contains(finalState))
+//                            this.acceptingStates.add(currentState);
+//                        if(nextStates.contains(finalState))
+//                            this.acceptingStates.add(nextStates);
+                    }
                 }
             }
         }
+    }
+
+    private void getDfaStartState(){
+        //First Add the nfa starting state as the DFA starting state
+        this.startingState.add(this.nfa.getStartingState());
+        if(this.nfa.getEpsilonMoveStates().containsKey(this.nfa.getStartingState())){
+
+            Set<String> nextStates = this.nfa.getEpsilonMoveStates().get(this.nfa.getStartingState());
+            this.startingState.addAll(nextStates);
+
+            while (!nextStates.isEmpty()){
+                String next = nextStates.iterator().next();
+                nextStates.remove(next);
+                if(this.nfa.getEpsilonMoveStates().get(next) != null){
+                    this.startingState.addAll(this.nfa.getEpsilonMoveStates().get(next));
+                    nextStates.addAll(this.nfa.getEpsilonMoveStates().get(next));
+                }
+            }
+        }
+        this.dfaStates.addAll(Collections.singleton(this.startingState));
+    }
+
+
+    public int countNumTransitions(){
+        int count = 0;
+        for(Set<String> fromState: this.dfaTransitionTable.keySet()){
+            for(String character: this.dfaTransitionTable.get(fromState).keySet())
+                count = count + 1;
+        }
+        return count;
     }
 }
